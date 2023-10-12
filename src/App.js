@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import { createContext, useEffect, useReducer } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { initialUser, persistUser, userReducer } from "./reducers/user";
 
-function App() {
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+
+export const Context = createContext();
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+]);
+
+const App = () => {
+  const [user, dispatch] = useReducer(userReducer, initialUser, persistUser);
+
+  useEffect(() => {
+    localStorage.setItem("user", JSON.stringify(user));
+  }, [user]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Context.Provider value={{ user, dispatch }}>
+      <RouterProvider router={router} />
+    </Context.Provider>
   );
-}
+};
 
 export default App;
